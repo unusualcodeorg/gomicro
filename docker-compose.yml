@@ -1,0 +1,68 @@
+services:
+  kong:
+    build:
+      context: ./kong
+    container_name: kong
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
+    environment:
+      - KONG_DATABASE=off
+      - KONG_DECLARATIVE_CONFIG=/etc/kong/kong.yml
+    depends_on:
+      - auth-service
+      - article-service
+
+  auth-service:
+    build:
+      context: ./auth
+    container_name: auth-service
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+
+  article-service:
+    build:
+      context: ./article
+    container_name: article-service
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+
+  mongo:
+    image: mongo:7.0.9
+    container_name: mongo
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_ADMIN}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_ADMIN_PWD}
+    ports:
+      - '${DB_PORT}:27017'
+    command: mongod --bind_ip_all
+    volumes:
+      - ./.extra/setup/auth-init-mongo.js:/docker-entrypoint-initdb.d/auth-init-mongo.js:ro
+      - ./.extra/setup/article-init-mongo.js:/docker-entrypoint-initdb.d/article-init-mongo.js:ro
+      - dbdata:/data/db
+
+  redis:
+    image: redis:7.2.3
+    container_name: redis
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - '${REDIS_PORT}:6379'
+    command: redis-server --bind localhost --bind 0.0.0.0 --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - cache:/data/cache
+
+volumes:
+  dbdata:
+  cache:
+    driver: local
+ 
