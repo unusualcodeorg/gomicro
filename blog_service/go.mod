@@ -6,7 +6,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/spf13/viper v1.19.0
-	github.com/unusualcodeorg/goserve v1.1.8
+	github.com/unusualcodeorg/goserve v1.1.9
 	go.mongodb.org/mongo-driver v1.16.0
 )
 

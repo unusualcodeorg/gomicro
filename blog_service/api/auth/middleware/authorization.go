@@ -27,7 +27,7 @@ func (m *authorizationProvider) Middleware(roleNames ...string) gin.HandlerFunc 
 
 		err := m.authService.Authorize(user, roleNames...)
 		if err != nil {
-			m.Send(ctx).ForbiddenError("permission denied: does not have suffient role", err)
+			m.Send(ctx).ForbiddenError(err.Error(), err)
 			return
 		}
 
