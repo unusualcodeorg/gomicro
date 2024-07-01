@@ -44,7 +44,7 @@ func (c *controller) MountRoutes(group *gin.RouterGroup) {
 func (c *controller) pingHandler(req micro.NatsRequest) {
 	fmt.Println(string(req.Data()))
 	msg := message.NewSampleMessage("from", "microservice1")
-	micro.Respond(req, msg, nil)
+	c.SendNats(req).Message(msg)
 }
 
 func (c *controller) getEchoHandler(ctx *gin.Context) {
@@ -53,7 +53,7 @@ func (c *controller) getEchoHandler(ctx *gin.Context) {
 
 func (c *controller) getServicePingHandler(ctx *gin.Context) {
 	msg := message.NewSampleMessage("from", "microservice1")
-	received, err := micro.Request(c.Context(), "microservice2.sample.ping", msg, message.EmptySampleMessage())
+	received, err := c.service.GetSampleMessage(msg)
 	if err != nil {
 		c.Send(ctx).MixedError(err)
 		return

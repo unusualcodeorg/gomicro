@@ -52,15 +52,18 @@ func create(env *config.Env) (micro.Router, Module, Shutdown) {
 	store := redis.NewStore(context, &redisConfig)
 	store.Connect()
 
-	module := NewModule(context, env, db, store)
-
 	natsConfig := micro.Config{
 		NatsUrl:            env.NatsUrl,
 		NatsServiceName:    env.NatsServiceName,
 		NatsServiceVersion: env.NatsServiceVersion,
+		Timeout:            time.Second * 10,
 	}
 
-	router := micro.NewRouter(env.GoMode, &natsConfig)
+	natsClient := micro.NewNatsClient(&natsConfig)
+
+	module := NewModule(context, env, db, store, natsClient)
+
+	router := micro.NewRouter(env.GoMode, natsClient)
 	router.RegisterValidationParsers(network.CustomTagNameFunc())
 	router.LoadRootMiddlewares(module.RootMiddlewares())
 	router.LoadControllers(module.Controllers())
@@ -68,7 +71,7 @@ func create(env *config.Env) (micro.Router, Module, Shutdown) {
 	shutdown := func() {
 		db.Disconnect()
 		store.Disconnect()
-		router.Disconnect()
+		natsClient.Disconnect()
 	}
 
 	return router, module, shutdown

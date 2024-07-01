@@ -15,10 +15,11 @@ import (
 type Module micro.Module[module]
 
 type module struct {
-	Context context.Context
-	Env     *config.Env
-	DB      mongo.Database
-	Store   redis.Store
+	Context    context.Context
+	Env        *config.Env
+	DB         mongo.Database
+	Store      redis.Store
+	NatsClient micro.NatsClient
 }
 
 func (m *module) GetInstance() *module {
@@ -27,7 +28,7 @@ func (m *module) GetInstance() *module {
 
 func (m *module) Controllers() []micro.Controller {
 	return []micro.Controller{
-		sample.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), sample.NewService(m.DB, m.Store)),
+		sample.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), sample.NewService(m.DB, m.Store, m.NatsClient)),
 	}
 }
 
@@ -48,11 +49,12 @@ func (m *module) AuthorizationProvider() network.AuthorizationProvider {
 	return nil
 }
 
-func NewModule(context context.Context, env *config.Env, db mongo.Database, store redis.Store) Module {
+func NewModule(context context.Context, env *config.Env, db mongo.Database, store redis.Store, natsClient micro.NatsClient) Module {
 	return &module{
-		Context: context,
-		Env:     env,
-		DB:      db,
-		Store:   store,
+		Context:    context,
+		Env:        env,
+		DB:         db,
+		Store:      store,
+		NatsClient: natsClient,
 	}
 }
