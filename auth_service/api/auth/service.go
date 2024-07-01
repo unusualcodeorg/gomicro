@@ -18,6 +18,8 @@ import (
 )
 
 type Service interface {
+	Authenticate(token string) (*userModel.User, *model.Keystore, error)
+	Authorize(user *userModel.User, roles ...string) error
 	SignUpBasic(signUpDto *dto.SignUpBasic) (*dto.UserAuth, error)
 	SignInBasic(signInDto *dto.SignInBasic) (*dto.UserAuth, error)
 	RenewToken(tokenRefreshDto *dto.TokenRefresh, accessToken string) (*dto.UserTokens, error)
@@ -88,6 +90,68 @@ func NewService(
 		tokenIssuer:          env.TokenIssuer,
 		tokenAudience:        env.TokenAudience,
 	}
+}
+
+func (s *service) Authenticate(authToken string) (*userModel.User, *model.Keystore, error) {
+	if len(authToken) == 0 {
+		return nil, nil, network.NewUnauthorizedError("permission denied: missing Authorization", nil)
+	}
+
+	token := utils.ExtractBearerToken(authToken)
+	if token == "" {
+		return nil, nil, network.NewUnauthorizedError("permission denied: invalid Authorization", nil)
+	}
+
+	claims, err := s.VerifyToken(token)
+	if err != nil {
+		return nil, nil, network.NewUnauthorizedError(err.Error(), err)
+	}
+
+	valid := s.ValidateClaims(claims)
+	if !valid {
+		return nil, nil, network.NewUnauthorizedError("permission denied: invalid claims", nil)
+	}
+
+	userId, err := mongo.NewObjectID(claims.Subject)
+	if err != nil {
+		return nil, nil, network.NewUnauthorizedError("permission denied: invalid claims subject", nil)
+	}
+
+	user, err := s.userService.FindUserById(userId)
+	if err != nil {
+		return nil, nil, network.NewUnauthorizedError("permission denied: claims subject does not exists", err)
+	}
+
+	keystore, err := s.FindKeystore(user, claims.ID)
+	if err != nil || keystore == nil {
+		return nil, nil, network.NewUnauthorizedError("permission denied: invalid access token", err)
+	}
+
+	return user, keystore, nil
+}
+
+func (s *service) Authorize(user *userModel.User, roleNames ...string) error {
+	if len(roleNames) == 0 {
+		return network.NewForbiddenError("permission denied: role missing", nil)
+	}
+
+	hasRole := false
+	for _, code := range roleNames {
+		for _, role := range user.RoleDocs {
+			if role.Code == userModel.RoleCode(code) {
+				hasRole = true
+				break
+			}
+		}
+		if hasRole {
+			break
+		}
+	}
+
+	if !hasRole {
+		return network.NewForbiddenError("permission denied: does not have suffient role", nil)
+	}
+	return nil
 }
 
 func (s *service) SignUpBasic(signUpDto *dto.SignUpBasic) (*dto.UserAuth, error) {

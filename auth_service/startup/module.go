@@ -50,7 +50,7 @@ func (m *module) AuthenticationProvider() network.AuthenticationProvider {
 }
 
 func (m *module) AuthorizationProvider() network.AuthorizationProvider {
-	return authMW.NewAuthorizationProvider()
+	return authMW.NewAuthorizationProvider(m.AuthService)
 }
 
 func NewModule(context context.Context, env *config.Env, db mongo.Database, store redis.Store, natsClient micro.NatsClient) Module {

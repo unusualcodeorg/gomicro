@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/unusualcodeorg/gomicro/auth-service/api/user/model"
+	"github.com/unusualcodeorg/gomicro/auth-service/api/auth"
 	"github.com/unusualcodeorg/gomicro/auth-service/common"
 	"github.com/unusualcodeorg/goserve/arch/network"
 )
@@ -10,39 +10,24 @@ import (
 type authorizationProvider struct {
 	network.ResponseSender
 	common.ContextPayload
+	authService auth.Service
 }
 
-func NewAuthorizationProvider() network.AuthorizationProvider {
+func NewAuthorizationProvider(authService auth.Service) network.AuthorizationProvider {
 	return &authorizationProvider{
 		ResponseSender: network.NewResponseSender(),
 		ContextPayload: common.NewContextPayload(),
+		authService:    authService,
 	}
 }
 
 func (m *authorizationProvider) Middleware(roleNames ...string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		if len(roleNames) == 0 {
-			m.Send(ctx).ForbiddenError("permission denied: role missing", nil)
-			return
-		}
-
 		user := m.MustGetUser(ctx)
 
-		hasRole := false
-		for _, code := range roleNames {
-			for _, role := range user.RoleDocs {
-				if role.Code == model.RoleCode(code) {
-					hasRole = true
-					break
-				}
-			}
-			if hasRole {
-				break
-			}
-		}
-
-		if !hasRole {
-			m.Send(ctx).ForbiddenError("permission denied: does not have suffient role", nil)
+		err := m.authService.Authorize(user, roleNames...)
+		if err != nil {
+			m.Send(ctx).MixedError(err)
 			return
 		}
 

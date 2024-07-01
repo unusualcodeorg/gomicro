@@ -5,9 +5,7 @@ import (
 	"github.com/unusualcodeorg/gomicro/auth-service/api/auth"
 	"github.com/unusualcodeorg/gomicro/auth-service/api/user"
 	"github.com/unusualcodeorg/gomicro/auth-service/common"
-	"github.com/unusualcodeorg/goserve/arch/mongo"
 	"github.com/unusualcodeorg/goserve/arch/network"
-	"github.com/unusualcodeorg/goserve/utils"
 )
 
 type authenticationProvider struct {
@@ -29,44 +27,10 @@ func NewAuthenticationProvider(authService auth.Service, userService user.Servic
 func (m *authenticationProvider) Middleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader(network.AuthorizationHeader)
-		if len(authHeader) == 0 {
-			m.Send(ctx).UnauthorizedError("permission denied: missing Authorization", nil)
-			return
-		}
 
-		token := utils.ExtractBearerToken(authHeader)
-		if token == "" {
-			m.Send(ctx).UnauthorizedError("permission denied: invalid Authorization", nil)
-			return
-		}
-
-		claims, err := m.authService.VerifyToken(token)
+		user, keystore, err := m.authService.Authenticate(authHeader)
 		if err != nil {
-			m.Send(ctx).UnauthorizedError(err.Error(), err)
-			return
-		}
-
-		valid := m.authService.ValidateClaims(claims)
-		if !valid {
-			m.Send(ctx).UnauthorizedError("permission denied: invalid claims", nil)
-			return
-		}
-
-		userId, err := mongo.NewObjectID(claims.Subject)
-		if err != nil {
-			m.Send(ctx).UnauthorizedError("permission denied: invalid claims subject", nil)
-			return
-		}
-
-		user, err := m.userService.FindUserById(userId)
-		if err != nil {
-			m.Send(ctx).UnauthorizedError("permission denied: claims subject does not exists", err)
-			return
-		}
-
-		keystore, err := m.authService.FindKeystore(user, claims.ID)
-		if err != nil || keystore == nil {
-			m.Send(ctx).UnauthorizedError("permission denied: invalid access token", err)
+			m.Send(ctx).MixedError(err)
 			return
 		}
 
