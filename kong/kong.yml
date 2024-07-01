@@ -17,4 +17,4 @@ services:
 plugins:
   - name: apikey-auth-plugin
     config:
-      apikey_verification_url: http://auth:8000/ping
+      apikey_verification_url: http://auth:8000/verify/apikey

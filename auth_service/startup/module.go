@@ -40,7 +40,6 @@ func (m *module) Controllers() []micro.Controller {
 func (m *module) RootMiddlewares() []network.RootMiddleware {
 	return []network.RootMiddleware{
 		coreMW.NewErrorCatcher(), // NOTE: this should be the first handler to be mounted
-		authMW.NewKeyProtection(m.AuthService),
 		coreMW.NewNotFound(),
 	}
 }

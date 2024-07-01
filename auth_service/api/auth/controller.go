@@ -76,14 +76,26 @@ func (c *controller) authorizationHandler(req micro.NatsRequest) {
 }
 
 func (c *controller) MountRoutes(group *gin.RouterGroup) {
-	group.GET("/ping", c.pingHandler)
+	group.GET("/verify/apikey", c.verifyApikeyHandler)
 	group.POST("/signup/basic", c.signUpBasicHandler)
 	group.POST("/signin/basic", c.signInBasicHandler)
 	group.POST("/token/refresh", c.tokenRefreshHandler)
 	group.DELETE("/signout", c.Authentication(), c.signOutBasic)
 }
 
-func (c *controller) pingHandler(ctx *gin.Context) {
+func (c *controller) verifyApikeyHandler(ctx *gin.Context) {
+	key := ctx.GetHeader(network.ApiKeyHeader)
+	if len(key) == 0 {
+		c.Send(ctx).UnauthorizedError("permission denied: missing x-api-key header", nil)
+		return
+	}
+
+	_, err := c.service.FindApiKey(key)
+	if err != nil {
+		c.Send(ctx).ForbiddenError("permission denied: invalid x-api-key", err)
+		return
+	}
+
 	c.Send(ctx).SuccessMsgResponse("success")
 }
 
