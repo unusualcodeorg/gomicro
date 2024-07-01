@@ -1,14 +1,20 @@
 _format_version: "2.1"
+_transform: true
+
 services:
-  - name: microservice1
-    url: http://microservice1:8080
+  - name: auth
+    url: http://auth:8000
     routes:
-      - name: microservice1
+      - name: auth
         paths:
-          - /microservice1
-  - name: microservice2
-    url: http://microservice2:8080
+          - /auth
+  - name: blog
+    url: http://blog:8000
     routes:
-      - name: microservice2
+      - name: blog
         paths:
-          - /microservice2
+          - /blog    
+plugins:
+  - name: apikey-auth-plugin
+    config:
+      apikey_verification_url: http://auth:8000/verify/apikey

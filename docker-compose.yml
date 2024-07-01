@@ -10,26 +10,23 @@ services:
       - "8443:8443"
       - "8001:8001"
       - "8444:8444"
-    environment:
-      - KONG_DATABASE=off
-      - KONG_DECLARATIVE_CONFIG=/etc/kong/kong.yml
     depends_on:
-      - microservice1
-      - microservice2
+      - auth
+      - blog
 
-  microservice1:
+  auth:
     build:
-      context: ./microservice1
-    container_name: microservice1
+      context: ./auth_service
+    container_name: auth
     restart: unless-stopped
     depends_on:
       - mongo
       - redis
 
-  microservice2:
+  blog:
     build:
-      context: ./microservice2
-    container_name: microservice2
+      context: ./blog_service
+    container_name: blog
     restart: unless-stopped
     depends_on:
       - mongo
@@ -47,8 +44,8 @@ services:
       - '${DB_PORT}:27017'
     command: mongod --bind_ip_all
     volumes:
-      - ./.extra/setup/microservice1-init-mongo.js:/docker-entrypoint-initdb.d/microservice1-init-mongo.js:ro
-      - ./.extra/setup/microservice2-init-mongo.js:/docker-entrypoint-initdb.d/microservice2-init-mongo.js:ro
+      - ./.extra/setup/blog-init-mongo.js:/docker-entrypoint-initdb.d/blog-init-mongo.js:ro
+      - ./.extra/setup/auth-init-mongo.js:/docker-entrypoint-initdb.d/auth-init-mongo.js:ro
       - dbdata:/data/db
 
   redis:

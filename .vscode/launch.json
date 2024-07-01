@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Auth Service",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/auth_service/cmd/main.go",
+      "cwd": "${workspaceFolder}/auth_service",
+      "env": {},
+      "args": []
+    },
+		{
+      "name": "Blog Service",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/blog_service/cmd/main.go",
+      "cwd": "${workspaceFolder}/blog_service",
+      "env": {},
+      "args": []
+    }
+  ]
+}
