@@ -3,6 +3,7 @@ services:
     build:
       context: ./kong
     container_name: kong
+    user: root
     restart: unless-stopped
     ports:
       - "8000:8000"
