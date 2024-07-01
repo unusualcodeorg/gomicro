@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	AuthServiceURL string `json:"auth_service_url"`
+	ApiKeyVerificationURL string `json:"apikey_verification_url"`
 }
 
 func New() interface{} {
@@ -23,8 +23,7 @@ func (conf *Config) Access(kong *pdk.PDK) {
 		return
 	}
 
-	authURL := conf.AuthServiceURL + "/ping"
-	req, err := http.NewRequest("GET", authURL, nil)
+	req, err := http.NewRequest("GET", conf.ApiKeyVerificationURL, nil)
 	if err != nil {
 		kong.Log.Err(err.Error())
 		kong.Response.Exit(500, []byte(err.Error()), nil)

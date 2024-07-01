@@ -12,4 +12,4 @@ services:
 plugins:
   - name: apikey-auth-plugin
     config:
-      auth_service_url: http://auth:8080
+      apikey_verification_url: http://auth:8080/ping
