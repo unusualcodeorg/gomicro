@@ -13,22 +13,22 @@ services:
       - KONG_DATABASE=off
       - KONG_DECLARATIVE_CONFIG=/etc/kong/kong.yml
     depends_on:
-      - auth-service
-      - article-service
+      - microservice1
+      - microservice2
 
-  auth-service:
+  microservice1:
     build:
-      context: ./auth
-    container_name: auth-service
+      context: ./microservice1
+    container_name: microservice1
     restart: unless-stopped
     depends_on:
       - mongo
       - redis
 
-  article-service:
+  microservice2:
     build:
-      context: ./article
-    container_name: article-service
+      context: ./microservice2
+    container_name: microservice2
     restart: unless-stopped
     depends_on:
       - mongo
@@ -46,8 +46,8 @@ services:
       - '${DB_PORT}:27017'
     command: mongod --bind_ip_all
     volumes:
-      - ./.extra/setup/auth-init-mongo.js:/docker-entrypoint-initdb.d/auth-init-mongo.js:ro
-      - ./.extra/setup/article-init-mongo.js:/docker-entrypoint-initdb.d/article-init-mongo.js:ro
+      - ./.extra/setup/microservice1-init-mongo.js:/docker-entrypoint-initdb.d/microservice1-init-mongo.js:ro
+      - ./.extra/setup/microservice2-init-mongo.js:/docker-entrypoint-initdb.d/microservice2-init-mongo.js:ro
       - dbdata:/data/db
 
   redis:
@@ -60,6 +60,15 @@ services:
     command: redis-server --bind localhost --bind 0.0.0.0 --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
     volumes:
       - cache:/data/cache
+
+  nats:
+    image: nats:2.10.17
+    container_name: nats
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${NATS_CLIENT_PORT}:4222"
+      - "${NATS_MANAGEMENT_PORT}:8222"
 
 volumes:
   dbdata:
