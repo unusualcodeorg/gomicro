@@ -31,10 +31,15 @@ func (c *controller) MountNats(group micro.NatsGroup) {
 }
 
 func (c *controller) MountRoutes(group *gin.RouterGroup) {
+	group.POST("/ping", c.pingHandler)
 	group.POST("/signup/basic", c.signUpBasicHandler)
 	group.POST("/signin/basic", c.signInBasicHandler)
 	group.POST("/token/refresh", c.tokenRefreshHandler)
 	group.DELETE("/signout", c.Authentication(), c.signOutBasic)
+}
+
+func (c *controller) pingHandler(ctx *gin.Context) {
+	c.Send(ctx).SuccessMsgResponse("success")
 }
 
 func (c *controller) signUpBasicHandler(ctx *gin.Context) {

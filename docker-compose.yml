@@ -10,9 +10,6 @@ services:
       - "8443:8443"
       - "8001:8001"
       - "8444:8444"
-    environment:
-      - KONG_DATABASE=off
-      - KONG_DECLARATIVE_CONFIG=/etc/kong/kong.yml
     depends_on:
       - auth
       # - blog

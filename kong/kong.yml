@@ -1,4 +1,6 @@
 _format_version: "2.1"
+_transform: true
+
 services:
   - name: auth
     url: http://auth:8080
@@ -6,9 +8,8 @@ services:
       - name: auth
         paths:
           - /auth
-  # - name: blog
-  #   url: http://blog:8080
-  #   routes:
-  #     - name: blog
-  #       paths:
-  #         - /blog
+
+plugins:
+  - name: apikey-auth-plugin
+    config:
+      auth_service_url: http://auth:8080
