@@ -23,8 +23,7 @@ func NewController(
 	}
 }
 
-func (c *controller) MountNats(group micro.NatsGroup) {
-}
+func (c *controller) MountNats(group micro.NatsGroup) {}
 
 func (c *controller) MountRoutes(group *gin.RouterGroup) {
 	group.GET("/id/:id", c.getBlogByIdHandler)

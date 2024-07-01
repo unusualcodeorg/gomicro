@@ -7,6 +7,7 @@ import (
 	authMW "github.com/unusualcodeorg/gomicro/blog-service/api/auth/middleware"
 	"github.com/unusualcodeorg/gomicro/blog-service/api/author"
 	"github.com/unusualcodeorg/gomicro/blog-service/api/blog"
+	"github.com/unusualcodeorg/gomicro/blog-service/api/blogs"
 	"github.com/unusualcodeorg/gomicro/blog-service/api/editor"
 	"github.com/unusualcodeorg/gomicro/blog-service/config"
 	"github.com/unusualcodeorg/goserve/arch/micro"
@@ -35,6 +36,7 @@ func (m *module) GetInstance() *module {
 func (m *module) Controllers() []micro.Controller {
 	return []micro.Controller{
 		blog.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.BlogService),
+		blogs.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), blogs.NewService(m.DB, m.Store)),
 		author.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), author.NewService(m.DB, m.BlogService)),
 		editor.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), editor.NewService(m.DB, m.AuthService)),
 	}

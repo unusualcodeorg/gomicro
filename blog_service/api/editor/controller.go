@@ -27,8 +27,7 @@ func NewController(
 	}
 }
 
-func (c *controller) MountNats(group micro.NatsGroup) {
-}
+func (c *controller) MountNats(group micro.NatsGroup) {}
 
 func (c *controller) MountRoutes(group *gin.RouterGroup) {
 	group.Use(c.Authentication(), c.Authorization(string(message.RoleCodeEditor)))
