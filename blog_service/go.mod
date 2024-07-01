@@ -5,11 +5,9 @@ go 1.22.4
 require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/validator/v10 v10.22.0
-	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/spf13/viper v1.19.0
-	github.com/unusualcodeorg/goserve v1.1.5
+	github.com/unusualcodeorg/goserve v1.1.8
 	go.mongodb.org/mongo-driver v1.16.0
-	golang.org/x/crypto v0.24.0
 )
 
 require (
@@ -62,6 +60,7 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20240424034433-3c2c7870ae76 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
+	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect

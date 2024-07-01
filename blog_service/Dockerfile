@@ -12,12 +12,12 @@ RUN chown -R gouser:gouser /home/gouser/project
 
 USER gouser
 
-ENV SERVER_PORT=8080
+ENV SERVER_PORT=8000
 
 RUN go mod tidy
 RUN go build -o build/server cmd/main.go
 
-EXPOSE 8080
+EXPOSE 8000
 
 CMD ["./build/server"]
  

@@ -32,7 +32,7 @@ func (m *module) GetInstance() *module {
 
 func (m *module) Controllers() []micro.Controller {
 	return []micro.Controller{
-		auth.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.AuthService),
+		auth.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.AuthService, m.UserService),
 		user.NewController(m.AuthenticationProvider(), m.AuthorizationProvider(), m.UserService),
 	}
 }

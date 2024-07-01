@@ -3,13 +3,18 @@ _transform: true
 
 services:
   - name: auth
-    url: http://auth:8080
+    url: http://auth:8000
     routes:
       - name: auth
         paths:
           - /auth
-
+  - name: blog
+    url: http://blog:8000
+    routes:
+      - name: blog
+        paths:
+          - /blog    
 plugins:
   - name: apikey-auth-plugin
     config:
-      apikey_verification_url: http://auth:8080/ping
+      apikey_verification_url: http://auth:8000/ping

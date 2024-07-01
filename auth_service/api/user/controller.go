@@ -2,10 +2,12 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/unusualcodeorg/gomicro/auth-service/api/auth/message"
 	"github.com/unusualcodeorg/gomicro/auth-service/common"
 	coredto "github.com/unusualcodeorg/goserve/arch/dto"
 	"github.com/unusualcodeorg/goserve/arch/micro"
 	"github.com/unusualcodeorg/goserve/arch/network"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type controller struct {
@@ -27,6 +29,29 @@ func NewController(
 }
 
 func (c *controller) MountNats(group micro.NatsGroup) {
+	group.AddEndpoint("user", micro.NatsHandlerFunc(c.userHandler))
+}
+
+func (c *controller) userHandler(req micro.NatsRequest) {
+	text, err := micro.ParseMsg[message.Text](req.Data())
+	if err != nil {
+		c.SendNats(req).Error(err)
+		return
+	}
+
+	userId, err := primitive.ObjectIDFromHex(text.Value)
+	if err != nil {
+		c.SendNats(req).Error(err)
+		return
+	}
+
+	user, err := c.service.FindUserPublicProfile(userId)
+	if err != nil {
+		c.SendNats(req).Error(err)
+		return
+	}
+
+	c.SendNats(req).Message(message.NewUser(user))
 }
 
 func (c *controller) MountRoutes(group *gin.RouterGroup) {

@@ -15,22 +15,32 @@ type Service interface {
 
 type service struct {
 	network.BaseService
+	authRequestBuilder  micro.RequestBuilder[message.User]
+	authzRequestBuilder micro.RequestBuilder[message.User]
+	userRequestBuilder  micro.RequestBuilder[message.User]
 }
 
 func NewService(natsClient micro.NatsClient) Service {
 	return &service{
-		BaseService: network.NewBaseService(),
+		BaseService:         network.NewBaseService(),
+		authRequestBuilder:  micro.NewRequestBuilder[message.User](natsClient, "auth.authentication"),
+		authzRequestBuilder: micro.NewRequestBuilder[message.User](natsClient, "auth.authorization"),
+		userRequestBuilder:  micro.NewRequestBuilder[message.User](natsClient, "auth.profile.user"),
 	}
 }
 
 func (s *service) Authenticate(token string) (*message.User, error) {
-	return nil, nil
+	msg := message.NewText(token)
+	return s.authRequestBuilder.Request(msg).Nats()
 }
 
 func (s *service) Authorize(user *message.User, roles ...string) error {
-	return nil
+	msg := message.NewUserRole(user, roles...)
+	_, err := s.authzRequestBuilder.Request(msg).Nats()
+	return err
 }
 
 func (s *service) FindUserPublicProfile(userId primitive.ObjectID) (*message.User, error) {
-	return nil, nil
+	msg := message.NewText(userId.Hex())
+	return s.userRequestBuilder.Request(msg).Nats()
 }

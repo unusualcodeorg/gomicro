@@ -27,7 +27,7 @@ func (m *authenticationProvider) Middleware() gin.HandlerFunc {
 
 		user, err := m.authService.Authenticate(authHeader)
 		if err != nil {
-			m.Send(ctx).MixedError(err)
+			m.Send(ctx).UnauthorizedError(err.Error(), err)
 			return
 		}
 

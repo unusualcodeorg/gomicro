@@ -17,16 +17,18 @@ func New() interface{} {
 }
 
 func (conf *Config) Access(kong *pdk.PDK) {
+	headers := map[string][]string{"Content-Type": {"application/json"}}
+
 	apiKey, err := kong.Request.GetHeader("x-api-key")
 	if err != nil {
-		kong.Response.Exit(401, []byte(err.Error()), nil)
+		kong.Response.Exit(401, []byte(err.Error()), headers)
 		return
 	}
 
 	req, err := http.NewRequest("GET", conf.ApiKeyVerificationURL, nil)
 	if err != nil {
 		kong.Log.Err(err.Error())
-		kong.Response.Exit(500, []byte(err.Error()), nil)
+		kong.Response.Exit(500, []byte(err.Error()), headers)
 		return
 	}
 
@@ -35,7 +37,7 @@ func (conf *Config) Access(kong *pdk.PDK) {
 	resp, err := client.Do(req)
 	if err != nil {
 		kong.Log.Err(err.Error())
-		kong.Response.Exit(500, []byte(err.Error()), nil)
+		kong.Response.Exit(500, []byte(err.Error()), headers)
 		return
 	}
 	defer resp.Body.Close()
@@ -43,7 +45,7 @@ func (conf *Config) Access(kong *pdk.PDK) {
 	if resp.StatusCode != 200 {
 		body, _ := io.ReadAll(resp.Body)
 		kong.Log.Err(string(body))
-		kong.Response.Exit(resp.StatusCode, body, nil)
+		kong.Response.Exit(resp.StatusCode, body, headers)
 		return
 	}
 }

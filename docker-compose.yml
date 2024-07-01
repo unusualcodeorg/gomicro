@@ -12,7 +12,7 @@ services:
       - "8444:8444"
     depends_on:
       - auth
-      # - blog
+      - blog
 
   auth:
     build:
@@ -23,14 +23,14 @@ services:
       - mongo
       - redis
 
-  # blog:
-  #   build:
-  #     context: ./service_auth
-  #   container_name: blog
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - mongo
-  #     - redis
+  blog:
+    build:
+      context: ./blog_service
+    container_name: blog
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
 
   mongo:
     image: mongo:7.0.9
