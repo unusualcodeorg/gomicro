@@ -15,3 +15,10 @@
 - mongo
 - redis
 
+# Microservice System Design
+
+## Without Load Balancing
+![Banner](.extra/docs/system.png)
+
+## With Load Balancing
+![Banner](.extra/docs/system-load-balanced.png)
