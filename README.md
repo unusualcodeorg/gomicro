@@ -7,7 +7,7 @@ This project creates a blogging API service using [goserve](https://github.com/u
 
 This project breaks down the monolithic go blog backend project provided at [goserve](https://github.com/unusualcodeorg/goserve) repository. It uses the [goserve](https://github.com/unusualcodeorg/goserve) REST API framework to build the auth_service, and blog_service.
 
-## Highlights
+### Highlights
 - goserve micro architecture
 - kong API gateway
 - nats for microservices communication
@@ -18,7 +18,7 @@ This project breaks down the monolithic go blog backend project provided at [gos
 
 > More details on the REST part can be found at [goserve](https://github.com/unusualcodeorg/goserve) github repo
 
-# Project Directories
+### Project Directories
 1. **kong**: kong configuration and plugins
 2. **auth_service**: auth APIs code 
 3. **blog_service**: blog APIs code 
@@ -28,7 +28,7 @@ This project breaks down the monolithic go blog backend project provided at [gos
 2. **.tools**: RSA key generator, and .env copier
 3. **.vscode**: editor config and service debug launch settings
 
-# Microservice System Design
+## Microservice System Design
 
 **Request Flow**
 - client request comes to kong 
@@ -59,7 +59,7 @@ This project breaks down the monolithic go blog backend project provided at [gos
 **2. With Load Balancing**
 ![Banner](.extra/docs/system-load-balanced.png)
 
-# Installation Instructions
+## Installation Instructions
 vscode is the recommended editor - dark theme 
 
 **1. Get the repo**
@@ -96,17 +96,17 @@ You will be able to access the api from http://localhost:8000
 
 > If having any issue make sure 8000 port is not occupied
 
-## API DOC
+### API DOC
 [![API Documentation](https://img.shields.io/badge/API%20Documentation-View%20Here-blue?style=for-the-badge)](https://documenter.getpostman.com/view/1552895/2sA3dxCWsa)
 
-# Read the Articles to understand this project
+## Read the Articles to understand this project
 [How to Architect Good Go Backend REST API Services](https://medium.com/@janishar.ali/how-to-architecture-good-go-backend-rest-api-services-14cc4730c05b)
 
-# Documentation
+## Documentation
 Information about the framework
 > API framework details can be found at [goserve](https://github.com/unusualcodeorg/goserve) github repo
 
-## NATS
+### NATS
 To communicate among services through nats a message struct is required
 
 ```go
@@ -129,7 +129,7 @@ func NewSampleMessage(f1, f2 string) *SampleMessage {
 }
 ```
 
-## Controller
+### Controller
 - It implements `micro.Controller` from `github.com/unusualcodeorg/goserve/arch/micro`
 - `MountNats` is used to mount the endpoints that other services can call through nats 
 - `MountRoutes` is used to mount the endpoints for http clients
@@ -192,7 +192,7 @@ func (c *controller) getServicePingHandler(ctx *gin.Context) {
 
 ```
 
-## Service
+### Service
 - `micro.RequestBuilder[message.SampleMessage]` is used to call other services to get `SampleMessage` through nats
 
 ```go
@@ -248,7 +248,7 @@ func (s *service) FindSample(id primitive.ObjectID) (*model.Sample, error) {
 
 ```
 
-## NatsClient
+### NatsClient
 NatsClient should be created to connect and talk to nats
 ```go
   natsConfig := micro.Config{
