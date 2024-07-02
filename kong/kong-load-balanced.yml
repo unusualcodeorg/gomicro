@@ -1,0 +1,38 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  - name: auth
+    url: http://auth_upstream
+    routes:
+      - name: auth
+        paths:
+          - /auth
+  - name: blog
+    url: http://blog_upstream
+    routes:
+      - name: blog
+        paths:
+          - /blog
+
+upstreams:
+  - name: auth_upstream
+    targets:
+      - target: auth1:8000
+        weight: 100
+      - target: auth2:8000
+        weight: 100
+
+  - name: blog_upstream
+    targets:
+      - target: blog1:8000
+        weight: 100
+      - target: blog2:8000
+        weight: 100
+
+plugins:
+  - name: apikey-auth-plugin
+    config:
+      verification_urls: 
+        - http://auth1:8000/verify/apikey
+        - http://auth2:8000/verify/apikey

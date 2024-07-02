@@ -1,0 +1,94 @@
+services:
+  kong:
+    build:
+      context: ./kong
+      dockerfile: ./Dockerfile-load-balanced
+    container_name: kong
+    user: root
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
+    depends_on:
+      - auth1
+      - auth2
+      - blog1
+      - blog2
+
+  auth1:
+    build:
+      context: ./auth_service
+    container_name: auth1
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+  auth2:
+    build:
+      context: ./auth_service
+    container_name: auth2
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+
+  blog1:
+    build:
+      context: ./blog_service
+    container_name: blog1
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+  blog2:
+    build:
+      context: ./blog_service
+    container_name: blog2
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+
+  mongo:
+    image: mongo:7.0.9
+    container_name: mongo
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_ADMIN}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_ADMIN_PWD}
+    ports:
+      - '${DB_PORT}:27017'
+    command: mongod --bind_ip_all
+    volumes:
+      - ./.extra/setup/blog-init-mongo.js:/docker-entrypoint-initdb.d/blog-init-mongo.js:ro
+      - ./.extra/setup/auth-init-mongo.js:/docker-entrypoint-initdb.d/auth-init-mongo.js:ro
+      - dbdata:/data/db
+
+  redis:
+    image: redis:7.2.3
+    container_name: redis
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - '${REDIS_PORT}:6379'
+    command: redis-server --bind localhost --bind 0.0.0.0 --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - cache:/data/cache
+
+  nats:
+    image: nats:2.10.17
+    container_name: nats
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${NATS_CLIENT_PORT}:4222"
+      - "${NATS_MANAGEMENT_PORT}:8222"
+
+volumes:
+  dbdata:
+  cache:
+    driver: local
+ 
