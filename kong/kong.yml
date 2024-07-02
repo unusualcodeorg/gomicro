@@ -17,4 +17,5 @@ services:
 plugins:
   - name: apikey-auth-plugin
     config:
-      apikey_verification_url: http://auth:8000/verify/apikey
+      verification_urls: 
+        - http://auth:8000/verify/apikey

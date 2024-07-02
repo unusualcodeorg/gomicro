@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"math/rand"
 	"net/http"
 
 	"github.com/Kong/go-pdk"
@@ -9,7 +10,7 @@ import (
 )
 
 type Config struct {
-	ApiKeyVerificationURL string `json:"apikey_verification_url"`
+	ApiKeyVerificationURLs []string `json:"verification_urls"`
 }
 
 func New() interface{} {
@@ -25,7 +26,20 @@ func (conf *Config) Access(kong *pdk.PDK) {
 		return
 	}
 
-	req, err := http.NewRequest("GET", conf.ApiKeyVerificationURL, nil)
+	var verificationURL string
+	switch len(conf.ApiKeyVerificationURLs) {
+	case 0:
+		kong.Log.Err("verification_urls is missing in apikey_auth_plugin")
+		kong.Response.Exit(500, []byte(`{"code":"10001","status":"500","message":"something went wrong"}`), headers)
+		return
+	case 1:
+		verificationURL = conf.ApiKeyVerificationURLs[0]
+	default:
+		randomIndex := rand.Intn(len(conf.ApiKeyVerificationURLs))
+		verificationURL = conf.ApiKeyVerificationURLs[randomIndex]
+	}
+
+	req, err := http.NewRequest("GET", verificationURL, nil)
 	if err != nil {
 		kong.Log.Err(err.Error())
 		kong.Response.Exit(500, []byte(err.Error()), headers)
