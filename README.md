@@ -59,26 +59,26 @@ This project breaks down the monolithic go blog backend project provided at [gos
 **2. With Load Balancing**
 ![Banner](.extra/docs/system-load-balanced.png)
 
-# Installation Instruction
+# Installation Instructions
 vscode is the recommended editor - dark theme 
 
-### 1. Get the repo 
+**1. Get the repo**
 
 ```bash
 git clone https://github.com/unusualcodeorg/gomicro.git
 ```
 
-### 2. Generate RSA Keys
+**2. Generate RSA Keys**
 ```
 go run .tools/rsa/keygen.go
 ```
 
-### 3. Create .env files
+**3. Create .env files**
 ```
 go run .tools/copy/envs.go 
 ```
 
-### 4. Run Docker Compose
+**4. Run Docker Compose**
 Install Docker and Docker Compose. [Find Instructions Here](https://docs.docker.com/install/).
 
 > Without Load Balancing
