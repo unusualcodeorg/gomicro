@@ -1,6 +1,6 @@
 module github.com/unusualcodeorg/gomicro/kong
 
-go 1.22.4
+go 1.22.5
 
 require github.com/Kong/go-pdk v0.11.0
 

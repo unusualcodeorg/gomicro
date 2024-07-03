@@ -1,5 +1,5 @@
 # Stage 1: Build the Go plugin
-FROM golang:latest as builder
+FROM golang:1.22.5-alpine as builder
 
 WORKDIR /plugins
 COPY . .
@@ -8,7 +8,7 @@ RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -o /plugins/apikey-auth-plugin main.go
 
 # Stage 2: Build the Kong Docker image
-FROM kong:latest
+FROM kong:3.7.1
 
 COPY --from=builder /plugins/apikey-auth-plugin /usr/local/bin/apikey-auth-plugin
 
