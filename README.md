@@ -100,7 +100,8 @@ You will be able to access the api from http://localhost:8000
 [![API Documentation](https://img.shields.io/badge/API%20Documentation-View%20Here-blue?style=for-the-badge)](https://documenter.getpostman.com/view/1552895/2sA3dxCWsa)
 
 ## Read the Articles to understand this project
-[How to Architect Good Go Backend REST API Services](https://medium.com/@janishar.ali/how-to-architecture-good-go-backend-rest-api-services-14cc4730c05b)
+1. [How to Create Microservices — A Practical Guide Using Go](https://medium.com/@janishar.ali/how-to-create-microservices-a-practical-guide-using-go-35445a821513)
+2. [How to Architect Good Go Backend REST API Services](https://medium.com/@janishar.ali/how-to-architecture-good-go-backend-rest-api-services-14cc4730c05b)
 
 ## Documentation
 Information about the framework
@@ -264,7 +265,6 @@ NatsClient should be created to connect and talk to nats
 
 ### If you are coming from [goserve](https://github.com/unusualcodeorg/goserve) framework for monolithic go architecture
 - `micro.Module[module]` should used for instance creation in place of `network.Module[module]`
-- `micro.NewRouter` should be used in place of `network.NewRouter`
 - `micro.NewRouter` should be used in place of `network.NewRouter`
 - `micro.BaseController` should be used in place of `network.BaseController`
 - `micro.Controller` should be used in place of `network.Controller`
